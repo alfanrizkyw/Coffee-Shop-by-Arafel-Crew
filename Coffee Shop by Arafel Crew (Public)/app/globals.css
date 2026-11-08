@@ -1,0 +1,209 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  @apply text-cream font-body antialiased;
+  background-color: #081511;
+}
+
+/* Latar gradasi berlapis — fixed agar tidak repaint saat scroll, opacity rendah supaya tenang. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 80% at 10% -10%, rgba(43, 106, 71, 0.22), transparent 58%),
+    radial-gradient(100% 70% at 100% 112%, rgba(154, 107, 47, 0.13), transparent 55%),
+    linear-gradient(160deg, #0c1f18 0%, #081511 55%, #0a1a13 100%);
+}
+
+::selection {
+  background: #2b6a47;
+  color: #f1e9d6;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #215038 #0c1f18;
+}
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #215038;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #0c1f18;
+}
+
+:focus-visible {
+  outline: 2px solid #7cc49a;
+  outline-offset: 2px;
+}
+
+input,
+select,
+textarea {
+  @apply bg-forest-900 border border-forest-700 rounded-lg px-3 py-2.5 text-cream placeholder:text-moss/50 text-base;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid #4ca372;
+  outline-offset: 0;
+  border-color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-[background-color,border-color,color,transform] duration-200 cursor-pointer select-none min-h-[44px] px-4 py-2.5 text-sm disabled:opacity-45 disabled:cursor-not-allowed active:scale-[0.97];
+  }
+  .btn-primary {
+    @apply btn bg-forest-600 text-white hover:bg-forest-500 active:bg-forest-700;
+  }
+  .btn-wood {
+    @apply btn bg-wood-500 text-forest-950 hover:bg-wood-400 active:bg-wood-600;
+  }
+  .btn-ghost {
+    @apply btn bg-transparent border border-forest-700 text-cream hover:bg-forest-800;
+  }
+  .btn-danger {
+    @apply btn bg-danger/15 border border-danger/40 text-red-300 hover:bg-danger/25;
+  }
+  .card {
+    @apply bg-forest-850 border border-forest-750 rounded-xl shadow-card;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold min-h-[36px] cursor-pointer transition-colors duration-200 border;
+  }
+  .label {
+    @apply block text-sm font-semibold text-cream-dim mb-1.5;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide;
+  }
+  .glass {
+    background: linear-gradient(150deg, rgba(20, 49, 36, 0.72), rgba(12, 31, 24, 0.6));
+    backdrop-filter: blur(14px) saturate(1.15);
+    -webkit-backdrop-filter: blur(14px) saturate(1.15);
+    border: 1px solid rgba(124, 196, 154, 0.14);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 8px 30px rgba(0, 0, 0, 0.32);
+  }
+}
+
+/* Animasi masuk — hanya transform & opacity agar ringan dan tidak memicu layout. */
+@keyframes ab-fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes ab-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes ab-scale-in {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes ab-slide-up {
+  from { opacity: 0; transform: translateY(100%); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes ab-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+@keyframes ab-ready-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(70, 167, 88, 0); }
+  50% { box-shadow: 0 0 22px 2px rgba(70, 167, 88, 0.28); }
+}
+@keyframes ab-ring {
+  0%, 72%, 100% { transform: rotate(0); }
+  6% { transform: rotate(15deg); }
+  14% { transform: rotate(-13deg); }
+  22% { transform: rotate(11deg); }
+  30% { transform: rotate(-9deg); }
+  38% { transform: rotate(6deg); }
+  46% { transform: rotate(-4deg); }
+  54% { transform: rotate(2deg); }
+}
+@keyframes ab-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.anim-fade-up { animation: ab-fade-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+.anim-fade-in { animation: ab-fade-in 0.2s ease-out backwards; }
+.anim-scale-in { animation: ab-scale-in 0.26s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+.anim-slide-up { animation: ab-slide-up 0.32s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+
+.skeleton {
+  background: linear-gradient(90deg, #143124 25%, #1a3b2c 50%, #143124 75%);
+  background-size: 200% 100%;
+  animation: ab-shimmer 1.4s ease-in-out infinite;
+}
+
+.ready-banner { animation: ab-fade-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards, ab-ready-glow 2.4s ease-in-out 0.4s infinite; }
+.anim-ring { animation: ab-ring 1.8s ease-in-out infinite; transform-origin: top center; }
+.anim-float { animation: ab-float 5s ease-in-out infinite; }
+
+/* Miring 3D ringan — hanya transform, digerakkan pointer, mati di layar sentuh & reduced-motion. */
+.tilt { perspective: 900px; }
+.tilt-inner {
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform-style: preserve-3d;
+  transition: transform 0.18s ease-out;
+}
+.tilt:hover .tilt-inner { will-change: transform; }
+.tilt-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.16), transparent 46%);
+}
+.tilt:hover .tilt-glare { opacity: 1; }
+.tilt-pop { transform: translateZ(26px); }
+
+@media (hover: none), (prefers-reduced-motion: reduce) {
+  .tilt-inner { transform: none !important; }
+  .tilt-glare { display: none; }
+  .anim-float { animation: none; }
+}
+
+@media (hover: hover) {
+  .card-lift { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
+  .card-lift:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45); border-color: #215038; }
+}
+
+@media print {
+  :root { color-scheme: light; }
+  html, body { background: #fff !important; }
+  body { color: #000 !important; }
+  * { box-shadow: none !important; text-shadow: none !important; }
+  @page { margin: 6mm; }
+}
