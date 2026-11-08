@@ -39,6 +39,9 @@ export function EmptyState({ title, desc }: { title: string; desc?: string }) {
   );
 }
 
+// Modal bertumpuk (mis. crop di atas form menu) harus menutup yang paling atas saja.
+const modalStack: symbol[] = [];
+
 export function Modal({ open, onClose, title, children, wide = false }: {
   open: boolean;
   onClose: () => void;
@@ -53,13 +56,19 @@ export function Modal({ open, onClose, title, children, wide = false }: {
 
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onCloseRef.current(); };
-    document.addEventListener('keydown', onKey);
+    const id = Symbol('modal');
+    modalStack.push(id);
     document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && modalStack[modalStack.length - 1] === id) onCloseRef.current();
+    };
+    document.addEventListener('keydown', onKey);
     ref.current?.focus();
     return () => {
+      const i = modalStack.indexOf(id);
+      if (i >= 0) modalStack.splice(i, 1);
+      if (modalStack.length === 0) document.body.style.overflow = '';
       document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
     };
   }, [open]);
 

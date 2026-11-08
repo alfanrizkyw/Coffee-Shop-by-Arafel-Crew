@@ -3,28 +3,29 @@
 import { useRef, useState } from 'react';
 import { ImagePlus, Loader2, Trash2 } from 'lucide-react';
 import { api } from '@/lib/api-client';
-import { compressImage } from '@/lib/image-client';
 import { useI18n } from '@/lib/i18n';
+import CropModal from '@/components/staff/CropModal';
 
-export default function ImageUpload({ value, onChange, label = 'Foto', maxDim = 1000, quality = 0.82, aspect = 'aspect-[4/3]' }: {
+export default function ImageUpload({ value, onChange, label = 'Foto', maxDim = 1000, quality = 0.82, ratio = 4 / 3, fit = 'cover' }: {
   value: string;
   onChange: (id: string) => void;
   label?: string;
   maxDim?: number;
   quality?: number;
-  aspect?: string;
+  ratio?: number;
+  fit?: 'cover' | 'contain';
 }) {
   const { t } = useI18n();
   const fileRef = useRef<HTMLInputElement>(null);
+  const [pending, setPending] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
 
-  const pick = async (file: File) => {
+  const upload = async (b64: string) => {
     setBusy(true);
     setErr('');
     try {
-      const img = await compressImage(file, maxDim, quality);
-      const res = await api<{ id: string }>('/api/staff/upload', 'POST', img);
+      const res = await api<{ id: string }>('/api/staff/upload', 'POST', { b64, mime: 'image/jpeg' });
       onChange(res.id);
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Gagal upload gambar.');
@@ -39,12 +40,12 @@ export default function ImageUpload({ value, onChange, label = 'Foto', maxDim = 
   return (
     <div className="space-y-2">
       <span className="label">{label}</span>
-      <div className={`relative ${aspect} max-w-xs rounded-lg overflow-hidden border border-forest-700 bg-forest-900`}>
+      <div className="relative w-full max-w-xs overflow-hidden rounded-lg border border-forest-700 bg-forest-900" style={{ aspectRatio: ratio }}>
         {src ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={src} alt={label} className="w-full h-full object-contain bg-white" />
+          <img src={src} alt={label} className={`absolute inset-0 h-full w-full ${fit === 'contain' ? 'object-contain bg-white' : 'object-cover'}`} />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-moss">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-moss">
             <ImagePlus size={24} aria-hidden />
             <span className="text-xs">{t('Belum ada gambar')}</span>
           </div>
@@ -62,9 +63,9 @@ export default function ImageUpload({ value, onChange, label = 'Foto', maxDim = 
         accept="image/*"
         className="hidden"
         aria-label={t('Pilih file {label}', { label })}
-        onChange={(e) => { const f = e.target.files?.[0]; if (f) pick(f); }}
+        onChange={(e) => { const f = e.target.files?.[0]; if (f) setPending(f); }}
       />
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <button type="button" onClick={() => fileRef.current?.click()} disabled={busy} className="btn-ghost !min-h-[38px] !text-xs">
           <ImagePlus size={14} /> {value ? t('Ganti Gambar') : t('Pilih Gambar')}
         </button>
@@ -74,7 +75,17 @@ export default function ImageUpload({ value, onChange, label = 'Foto', maxDim = 
           </button>
         )}
       </div>
-      <p className="text-xs text-moss">{t('JPG/PNG/WebP, otomatis dikompres biar hemat & cepat.')}</p>
+      <p className="text-xs text-moss">{t('JPG/PNG/WebP. Atur posisi & ukuran foto dulu, lalu otomatis dikompres.')}</p>
+
+      <CropModal
+        open={!!pending}
+        file={pending}
+        ratio={ratio}
+        maxDim={maxDim}
+        quality={quality}
+        onCancel={() => { setPending(null); if (fileRef.current) fileRef.current.value = ''; }}
+        onConfirm={(b64) => { setPending(null); upload(b64); }}
+      />
     </div>
   );
 }

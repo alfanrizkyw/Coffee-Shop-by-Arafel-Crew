@@ -121,8 +121,8 @@ export default function CustomerApp() {
           <HeroMedia alt={t('Ilustrasi hutan Area Barat — tupai menikmati secangkir kopi hangat saat senja')} />
           <div className="absolute inset-0 bg-gradient-to-r from-forest-950/95 via-forest-950/55 to-transparent" aria-hidden />
           <div className="absolute inset-x-0 bottom-0 h-[240px] bg-gradient-to-t from-forest-950 via-forest-950/80 to-transparent sm:hidden" aria-hidden />
-          <div className="relative mx-auto h-full max-w-7xl px-5 sm:px-8">
-            <div className="absolute top-4 right-5 z-30 sm:right-8">
+          <div className="relative mx-auto h-full max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="absolute top-4 right-4 z-30 sm:right-6 lg:right-8">
               <LangToggle />
             </div>
             <div className="flex h-full max-w-md flex-col justify-end pb-6 sm:justify-center sm:pb-0 anim-fade-up">
@@ -180,10 +180,13 @@ export default function CustomerApp() {
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="card overflow-hidden">
                 <div className="skeleton aspect-[4/3]" />
-                <div className="p-3 space-y-2">
-                  <div className="skeleton h-4 w-3/4 rounded" />
-                  <div className="skeleton h-3 w-1/2 rounded" />
-                  <div className="skeleton h-7 w-full rounded-md" />
+                <div className="flex flex-1 flex-col gap-1 p-3">
+                  <div className="skeleton h-10 w-3/4 rounded" />
+                  <div className="skeleton h-8 w-1/2 rounded" />
+                  <div className="mt-auto flex flex-col gap-2 pt-2 md:flex-row md:items-center md:justify-between">
+                    <div className="skeleton h-4 w-16 rounded" />
+                    <div className="skeleton h-9 w-full rounded-md md:w-20" />
+                  </div>
                 </div>
               </div>
             ))}
@@ -228,9 +231,9 @@ export default function CustomerApp() {
             {visible.length === 0 ? (
               <EmptyState title="Menu tidak ditemukan" desc={menu.length === 0 ? 'Belum ada menu. Bos bisa menambahkannya di halaman Bos.' : 'Coba kata kunci atau kategori lain.'} />
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 xl:gap-5 py-5">
+              <div className="grid grid-cols-2 items-stretch gap-3 py-5 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:gap-5">
                 {visible.map((m, i) => (
-                  <Tilt key={m.id} className="h-full">
+                  <Tilt key={m.id} className="h-full min-w-0">
                     <MenuCard item={m} index={i} qty={cart[m.id] || 0} disabled={maintenance} onSet={(q) => setQty(m.id, q)} />
                   </Tilt>
                 ))}
@@ -335,13 +338,13 @@ function MenuCard({ item, index, qty, disabled, onSet }: { item: MenuItem; index
   const { t } = useI18n();
   const habis = !item.tersedia;
   return (
-    <div className={`card card-lift overflow-hidden flex flex-col h-full anim-fade-up ${habis ? 'opacity-60' : ''}`} style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}>
-      <div className="relative aspect-[4/3] bg-forest-800">
+    <div className={`card card-lift flex h-full flex-col overflow-hidden anim-fade-up ${habis ? 'opacity-60' : ''}`} style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}>
+      <div className="relative aspect-[4/3] shrink-0 overflow-hidden bg-forest-800">
         {item.fotoId ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={`/api/img/${item.fotoId}`} alt={item.nama} loading="lazy" className="w-full h-full object-cover" />
+          <img src={`/api/img/${item.fotoId}`} alt={item.nama} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-forest-800 via-forest-850 to-forest-900">
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-forest-800 via-forest-850 to-forest-900">
             <span className="w-14 h-14 rounded-full bg-forest-750/60 border border-forest-700 flex items-center justify-center">
               <Leaf size={26} className="text-forest-400" aria-hidden />
             </span>
@@ -351,17 +354,17 @@ function MenuCard({ item, index, qty, disabled, onSet }: { item: MenuItem; index
           <span className="absolute top-2 left-2 badge bg-danger text-white">{t('Habis')}</span>
         )}
       </div>
-      <div className="p-3 flex flex-col gap-1 flex-1 min-w-0">
-        <p className="font-display font-semibold text-sm leading-snug break-words">{item.nama}</p>
-        {item.deskripsi && <p className="text-moss text-xs line-clamp-2">{item.deskripsi}</p>}
-        <div className="mt-auto pt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <span className="font-bold text-sm text-wood-300">{rupiah(item.harga)}</span>
+      <div className="flex min-w-0 flex-1 flex-col gap-1 p-3">
+        <p className="min-h-[2.75em] font-display font-semibold text-sm leading-snug break-words line-clamp-2">{item.nama}</p>
+        <p className="min-h-[2rem] text-xs leading-4 text-moss line-clamp-2">{item.deskripsi || '\u00A0'}</p>
+        <div className="mt-auto flex flex-col gap-2 pt-2 md:flex-row md:items-center md:justify-between">
+          <span className="font-bold text-sm text-wood-300 whitespace-nowrap">{rupiah(item.harga)}</span>
           {habis || disabled ? null : qty === 0 ? (
-            <button onClick={() => onSet(1)} className="btn-primary w-full sm:w-auto !min-h-[36px] !px-3 !py-1.5 !text-xs" aria-label={t('Tambah {nama} ke keranjang', { nama: item.nama })}>
+            <button onClick={() => onSet(1)} className="btn-primary w-full md:w-auto !min-h-[36px] !px-3 !py-1.5 !text-xs" aria-label={t('Tambah {nama} ke keranjang', { nama: item.nama })}>
               <Plus size={14} /> {t('Tambah')}
             </button>
           ) : (
-            <Stepper qty={qty} onSet={onSet} small className="w-full justify-between sm:w-auto sm:justify-start" />
+            <Stepper qty={qty} onSet={onSet} small className="w-full justify-between md:w-auto md:justify-start" />
           )}
         </div>
       </div>

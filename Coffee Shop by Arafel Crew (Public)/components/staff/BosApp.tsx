@@ -208,7 +208,8 @@ function QrisSettings() {
             label={t('QR QRIS aktif')}
             maxDim={1200}
             quality={0.9}
-            aspect="aspect-square"
+            ratio={1}
+            fit="contain"
           />
         )}
         {savingQris && <p className="text-xs text-moss">{t('Menyimpan QRIS…')}</p>}
